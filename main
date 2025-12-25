@@ -1,0 +1,354 @@
+local Workspace = game:GetService("Workspace")
+local UIS = game:GetService("UserInputService")
+
+local module = {}
+
+local Placeholder
+local Screen
+local ScreenGUI
+
+local HoveringOnScreen = false
+
+local MainMenu = game.Players.LocalPlayer.PlayerGui:FindFirstChild("MainMenu")
+
+local mods = {
+	[1] = {
+		["Name"] = "Console Commands v1.0.0",
+		["Link"] = "https://raw.githubusercontent.com/YoProMan/ConsoleCommands/refs/heads/main/Module"
+	}
+}
+
+function GetCameraInstance()
+	local camera = workspace.CurrentCamera
+
+	local origin = camera.CFrame.Position
+	local direction = camera.CFrame.LookVector * 1000
+
+	local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+
+	local result = workspace:Raycast(origin, direction, raycastParams)
+
+	if result then
+		local hitInstance = result.Instance
+
+		return hitInstance
+	end
+end
+
+local BASE_CFRAME =
+	CFrame.new(-257, 8, -343)
+	* CFrame.Angles(0, math.rad(-90), 0)
+
+local function createPart(parent, props)
+	local part = Instance.new(props.ClassName or "Part")
+	part.Anchored = true
+
+	for k, v in pairs(props) do
+		if k ~= "ClassName" then
+			part[k] = v
+		end
+	end
+
+	part.Parent = parent
+	return part
+end
+
+local function CreatePC()
+	local pcModel = Instance.new("Model")
+	pcModel.Name = "PC"
+	pcModel.Parent = Workspace
+	
+	createPart(pcModel, {
+		Name = "Base",
+		Size = Vector3.new(2.2, 0.2, 2.2),
+		Material = Enum.Material.SmoothPlastic,
+		Color = Color3.fromRGB(30, 30, 30),
+		CFrame = CFrame.new(0, 0, 0)
+	})
+	
+	createPart(pcModel, {
+		Name = "Stand",
+		Size = Vector3.new(0.3, 2.1, 0.3),
+		Color = Color3.fromRGB(40, 40, 40),
+		CFrame = CFrame.new(0, 1.15, 0)
+	})
+	
+	createPart(pcModel, {
+		Name = "MonitorFrame",
+		Size = Vector3.new(3.2, 2.0, 0.15),
+		Color = Color3.fromRGB(20, 20, 20),
+		CFrame = CFrame.new(0, 2, 0)
+	})
+	
+	createPart(pcModel, {
+		Name = "MonitorFrame",
+		Size = Vector3.new(3.2, 2.0, 0.15),
+		Material = Enum.Material.SmoothPlastic,
+		Color = Color3.fromRGB(20, 20, 20),
+		CFrame = CFrame.new(0, 2, 0)
+	})
+	
+	local screen = createPart(pcModel, {
+		Name = "ScreenPanel",
+		Size = Vector3.new(2.9, 1.6, 0.15),
+		Material = Enum.Material.SmoothPlastic,
+		Color = Color3.fromRGB(235, 235, 235),
+		CFrame = CFrame.new(0, 2, -0.085)  
+	})
+
+	local config = Instance.new("Configuration", screen)
+	config.Name = "BP"
+	
+	Screen = screen
+	
+	local keyboard = createPart(pcModel, {
+		Name = "Keyboard",
+		Size = Vector3.new(3.4, 0.15, 1.3),
+		Color = Color3.fromRGB(25, 25, 25),
+		CFrame = CFrame.new(0, 0.1, -2.1)
+	})
+
+	local decal = Instance.new("Decal")
+	decal.Name = "KeyboardDecal"
+	decal.Face = Enum.NormalId.Top
+	decal.Texture = "rbxassetid://921000725"
+	decal.Parent = keyboard
+	
+	createPart(pcModel, {
+		Name = "MonitorBasePlate",
+		Size = Vector3.new(1.8, 0.1, 1.2),
+		Color = Color3.fromRGB(35, 35, 35),
+		CFrame = CFrame.new(0, 0.25, 0)
+	})
+	
+	pcModel:PivotTo(BASE_CFRAME)
+
+	return pcModel
+end
+
+local function CreateUI()
+	local Modloader = Instance.new("ScreenGui")
+	Modloader.Name = "Modloader"
+	Modloader.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	Modloader.Parent = game.Players.LocalPlayer.PlayerGui
+	
+	ScreenGUI = Modloader
+    ScreenGUI.DisplayOrder = 101
+
+	local Main = Instance.new("Frame")
+	Main.Name = "Main"
+	Main.Size = UDim2.new(0.58, 0.00, 0.65, 0.00)
+	Main.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
+	Main.Position = UDim2.new(0.21, 0.00, 0.17, 0.00)
+	Main.BorderSizePixel = 0
+	Main.BackgroundTransparency = 0.20000000298023224
+	Main.BackgroundColor3 = Color3.new(0.18, 0.18, 0.18)
+	Main.Parent = Modloader
+
+	local UICorner = Instance.new("UICorner")
+	UICorner.Parent = Main
+
+	local MainTitle = Instance.new("Frame")
+	MainTitle.Name = "MainTitle"
+	MainTitle.Size = UDim2.new(0.24, 0.00, 0.13, 0.00)
+	MainTitle.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
+	MainTitle.BorderSizePixel = 0
+	MainTitle.BackgroundTransparency = 1
+	MainTitle.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
+	MainTitle.Parent = Main
+
+	local nm = Instance.new("TextLabel")
+	nm.Name = "nm"
+	nm.TextWrapped = true
+	nm.BorderSizePixel = 0
+	nm.RichText = true
+	nm.TextScaled = true
+	nm.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
+	nm.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+	nm.TextSize = 14
+	nm.Size = UDim2.new(1.00, 0.00, 1.00, 0.00)
+	nm.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
+	nm.Text = "Esternex' Modloader"
+	nm.TextColor3 = Color3.new(1.00, 1.00, 1.00)
+	nm.BackgroundTransparency = 1
+	nm.Parent = MainTitle
+
+	local UICorner_1 = Instance.new("UICorner")
+	UICorner_1.Parent = MainTitle
+
+	local UIStroke = Instance.new("UIStroke")
+	UIStroke.Color = Color3.new(1.00, 1.00, 1.00)
+	UIStroke.Thickness = 2.5
+	UIStroke.Parent = MainTitle
+
+	local UIStroke_1 = Instance.new("UIStroke")
+	UIStroke_1.Color = Color3.new(1.00, 1.00, 1.00)
+	UIStroke_1.Thickness = 5
+	UIStroke_1.Parent = Main
+
+	local Title = Instance.new("Frame")
+	Title.Name = "Title"
+	Title.Size = UDim2.new(0.75, 0.00, 0.13, 0.00)
+	Title.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
+	Title.Position = UDim2.new(0.25, 0.00, 0.00, 0.00)
+	Title.BorderSizePixel = 0
+	Title.BackgroundTransparency = 1
+	Title.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
+	Title.Parent = Main
+
+	local UIStroke_1 = Instance.new("UIStroke")
+	UIStroke_1.Color = Color3.new(1.00, 1.00, 1.00)
+	UIStroke_1.Thickness = 2.5
+	UIStroke_1.Parent = Title
+
+	local title = Instance.new("TextLabel")
+	title.Name = "title"
+	title.TextWrapped = true
+	title.BorderSizePixel = 0
+	title.TextScaled = true
+	title.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
+	title.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+	title.TextSize = 14
+	title.Size = UDim2.new(1.00, 0.00, 1.00, 0.00)
+	title.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
+	title.Text = "Mods"
+	title.TextColor3 = Color3.new(1.00, 1.00, 1.00)
+	title.BackgroundTransparency = 1
+	title.Parent = Title
+
+	local Mods = Instance.new("Frame")
+	Mods.Name = "Mods"
+	Mods.Size = UDim2.new(1.00, 0.00, 0.86, 0.00)
+	Mods.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
+	Mods.Position = UDim2.new(0.00, 0.00, 0.14, 0.00)
+	Mods.BorderSizePixel = 0
+	Mods.BackgroundTransparency = 0.699999988079071
+	Mods.BackgroundColor3 = Color3.new(0.00, 0.00, 0.00)
+	Mods.Parent = Main
+
+	local ModsSection = Instance.new("ScrollingFrame")
+	ModsSection.Name = "ModsSection"
+	ModsSection.Active = true
+	ModsSection.BorderSizePixel = 0
+	ModsSection.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
+	ModsSection.Size = UDim2.new(1.00, 0.00, 1.00, 0.00)
+	ModsSection.ScrollBarImageColor3 = Color3.new(0.00, 0.00, 0.00)
+	ModsSection.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
+	ModsSection.BackgroundTransparency = 1
+	ModsSection.Parent = Mods
+
+	local Mod = Instance.new("Frame")
+	Mod.Name = "Mod"
+	Mod.Size = UDim2.new(0.17, 0.00, 0.19, 0.00)
+	Mod.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
+	Mod.BorderSizePixel = 0
+	Mod.BackgroundColor3 = Color3.new(0.00, 0.00, 0.00)
+	Mod.Parent = ModsSection
+
+	local TITLE = Instance.new("TextLabel")
+	TITLE.Name = "TITLE"
+	TITLE.TextWrapped = true
+	TITLE.BorderSizePixel = 0
+	TITLE.TextScaled = true
+	TITLE.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
+	TITLE.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+	TITLE.TextSize = 14
+	TITLE.Size = UDim2.new(1.00, 0.00, 0.75, 0.00)
+	TITLE.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
+	TITLE.Text = "Mod Name"
+	TITLE.TextColor3 = Color3.new(1.00, 1.00, 1.00)
+	TITLE.BackgroundTransparency = 1
+	TITLE.Parent = Mod
+
+	local Execute = Instance.new("TextButton")
+	Execute.Name = "Execute"
+	Execute.TextWrapped = true
+	Execute.BorderSizePixel = 0
+	Execute.TextScaled = true
+	Execute.BackgroundColor3 = Color3.new(0.07, 1.00, 0.00)
+	Execute.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+	Execute.TextSize = 14
+	Execute.Size = UDim2.new(1.00, 0.00, 0.25, 0.00)
+	Execute.TextColor3 = Color3.new(1.00, 1.00, 1.00)
+	Execute.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
+	Execute.Text = "Execute"
+	Execute.BackgroundTransparency = 0.5
+	Execute.Position = UDim2.new(0.00, 0.00, 0.75, 0.00)
+	Execute.Parent = Mod
+
+	local UICorner_1 = Instance.new("UICorner")
+	UICorner_1.Parent = Execute
+
+	local UICorner_1 = Instance.new("UICorner")
+	UICorner_1.Parent = Mod
+
+	local UIGridLayout = Instance.new("UIGridLayout")
+	UIGridLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIGridLayout.CellSize = UDim2.new(0.17, 0.00, 0.19, 0.00)
+	UIGridLayout.Parent = ModsSection
+	
+	Placeholder = Mod
+	Mod.Visible = false
+	
+	for i, v in pairs(mods) do
+		task.spawn(function()
+			local frame = Placeholder:Clone()
+            frame.Parent = ModsSection
+			frame.Name = v["Name"]
+			frame.TITLE.Text = v["Name"]
+			frame.Execute.Activated:Connect(function()
+				local mod = loadstring(game:HttpGet(v["Link"], true))()
+				mod.Run({})
+			end)
+            frame.Visible = true
+            print("loaded mod "..v["Name"])
+		end)
+	end
+end
+
+UIS.InputBegan:Connect(function(inp, proc)
+	if proc then return end
+	
+	if inp.KeyCode == Enum.KeyCode.E then
+		if HoveringOnScreen then
+			ScreenGUI.Enabled = true
+            MainMenu.Enabled = true
+			
+			task.spawn(function()
+				repeat task.wait() until HoveringOnScreen == false
+				ScreenGUI.Enabled = false
+                MainMenu.Enabled = false
+			end)
+		end
+	end
+end)
+
+function module.Run(args)
+	if typeof(args) ~= "table" then
+		return
+	end
+
+	CreatePC()
+	CreateUI()
+
+    print("run")
+	
+	ScreenGUI.Enabled = false
+	
+	task.spawn(function()
+		while task.wait() do
+			local mousetarget = GetCameraInstance()
+			
+			if mousetarget == Screen then
+				HoveringOnScreen = true
+			else
+				HoveringOnScreen = false
+			end
+		end
+	end)
+end
+
+return module
