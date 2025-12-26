@@ -15,7 +15,11 @@ local mods = {
 	[1] = {
 		["Name"] = "Console Commands v1.0.0",
 		["Link"] = "https://raw.githubusercontent.com/YoProMan/ConsoleCommands/refs/heads/main/Module"
-	}
+	},
+	[2] = {
+		["Name"] = "Give Magic Carpet",
+		["Link"] = "https://raw.githubusercontent.com/YoProMan/HNFlyingCarpet/refs/heads/main/main"
+	},
 }
 
 function GetCameraInstance()
